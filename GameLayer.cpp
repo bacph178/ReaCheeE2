@@ -32,16 +32,10 @@ bool GameLayer::init(){
     _marioRoot = ccp(20 * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y);
     _lineRoot = ccp(25 * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y);
     
-    CCMenuItemImage *pCloseItem =
-    CCMenuItemImage::create("CloseNormal.png", "CloseSelected.png",
-                            this,menu_selector(GameLayer::closeCallback));
-    pCloseItem->
-    setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width - 20, 20));
-    
-    // create menu, it's an autorelease object
-    CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-    pMenu->setPosition( CCPointZero );
-    this->addChild(pMenu, 1);
+    CCSprite *background = CCSprite::create("bg.png");
+    background->setAnchorPoint(ccp(0.5, 0.5));
+    background->setPosition(ccp(_width / 2, _height / 2));
+    this->addChild(background);
     
     _mario = CCSprite::create("1.png");
     _mario->setAnchorPoint(ccp(0.5, 0));
@@ -62,16 +56,54 @@ bool GameLayer::init(){
     _tree2->setAnchorPoint(ccp(0, 1));
     this->addChild(_tree2);
     
-    _tap = CCSprite::create("Icon-72.png");
+    _tap = CCSprite::create("btn_push.png");
     _tap->setAnchorPoint(ccp(0.5 , 0));
     _tap->setPosition(ccp(_size.width / 2, 0));
     this->addChild(_tap);
+    
+    _tap2 = CCSprite::create("btn_push_over.png");
+    _tap2->setAnchorPoint(ccp(0.5 , 0));
+    _tap2->setPosition(ccp(_size.width / 2, 0));
+    _tap2->setVisible(false);
+    this->addChild(_tap2);
     
     _line = CCSprite::create("line03.png");
     _line->setScaleY(0);
     _line->setAnchorPoint(CCPointZero);
     _line->setPosition(_lineRoot);
     this->addChild(_line, 1000);
+    
+    // pause layer
+    _pauseLayer = CCSprite::create("frame_small.png");
+    _pauseLayer->setScale(_SIZE_RATIO);
+    _pauseLayer->setAnchorPoint(ccp(0.5, 1));
+    _pauseLayer->setPosition(ccp(_width / 2, _height));
+    
+    CCMenuItemImage * continueItem = CCMenuItemImage::create("continue.png", "continue.png",
+                                                        this, menu_selector(GameLayer::onContinue));
+    continueItem->setPosition(_pauseLayer->convertToNodeSpace(ccp(_width / 2, _height * 3.6 / 5)));
+    CCMenuItemImage * restartItem = CCMenuItemImage::create("restart.png", "restart.png",
+                                                            this, menu_selector(GameLayer::onRestart));
+    restartItem->setPosition(_pauseLayer->convertToNodeSpace(ccp(_width / 2, _height * 2.8 / 5)));
+    CCMenuItemImage * quitItem = CCMenuItemImage::create("quit.png", "quit.png",
+                                                         this, menu_selector(GameLayer::onQuit));
+    quitItem->setPosition(_pauseLayer->convertToNodeSpace(ccp(_width / 2, _height*2 / 5)));
+    CCMenu *pauseMenu = CCMenu::create(continueItem, restartItem, quitItem, NULL);
+    pauseMenu->setPosition(ccp(0, 0));
+    _pauseLayer->addChild(pauseMenu);
+    this->addChild(_pauseLayer);
+    _pauseLayer->setVisible(false);
+    
+    CCMenuItemImage *pCloseItem =
+    CCMenuItemImage::create("CloseNormal.png", "CloseSelected.png",
+                            this,menu_selector(GameLayer::closeCallback));
+    pCloseItem->
+    setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width - 20, 20));
+    
+    // create menu, it's an autorelease object
+    CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
+    pMenu->setPosition( CCPointZero );
+    this->addChild(pMenu, 1);
     
     this->setTouchEnabled(true);
     return true;
@@ -104,6 +136,7 @@ void GameLayer::updateBrige(float dt) {
 }
 
 void GameLayer::ccTouchesBegan(CCSet *pTouches, CCEvent * event) {
+    _tap2->setVisible(true);
     CCPoint location =
     this->getParent()->
     convertTouchToNodeSpace((CCTouch*)( pTouches->anyObject()));
@@ -117,6 +150,7 @@ void GameLayer::ccTouchesMoved(CCSet *pTouches, CCEvent * event) {
 }
 
 void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
+    _tap2->setVisible(false);
     float withLine = _line->getContentSize().height * _dt;
     CCPoint treeBackPoint = ccp(_mario->getPositionX() -
                                 _tree1->getContentSize().width, 200);
@@ -211,9 +245,23 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
 
 void GameLayer::closeCallback(CCObject* pSender)
 {
-    CCDirector::sharedDirector()->end();
-    
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
+//    CCDirector::sharedDirector()->end();
+//    
+//#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+//    exit(0);
+//#endif
+    _pauseLayer->setVisible(true);
+}
+
+void GameLayer::onContinue(CCObject * pSender) {
+    _pauseLayer->setVisible(false);
+}
+
+void GameLayer::onRestart(CCObject * pSender) {
+    _score = 0;
+    _pauseLayer->setVisible(false);
+}
+
+void GameLayer::onQuit(CCObject * pSender) {
+    CCDirector::sharedDirector()->runWithScene(HelloWorld::scene());
 }
