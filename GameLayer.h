@@ -20,8 +20,10 @@ private:
     CCSprite *_mario;
     CCSprite *_line;
     CCSprite *_tap;
+    CCSprite *_tap2;
     CCSprite *_tree1;
     CCSprite *_tree2;
+    CCSprite *_pauseLayer;
     
     CCPoint _marioRoot;
     CCPoint _lineRoot;
@@ -42,6 +44,9 @@ public:
     void menuCloseCallback(CCObject * pSender);
     void run();
     void updateBrige(float dt);
+    void onContinue(CCObject * pSender);
+    void onRestart(CCObject * pSender);
+    void onQuit(CCObject * pSender);
     virtual void ccTouchesBegan(CCSet* pTouches, CCEvent* event);
     virtual void ccTouchesMoved(CCSet* pTouches, CCEvent* event);
     virtual void ccTouchesEnded(CCSet* pTouches, CCEvent* event);
