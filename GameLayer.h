@@ -30,6 +30,8 @@ private:
     
     CCSize _size;
     
+    bool _isContinue;
+    
     float _dt;
     float _width;
     float _height;
