@@ -138,12 +138,12 @@ void GameLayer::updateBrige(float dt) {
 
 void GameLayer::ccTouchesBegan(CCSet *pTouches, CCEvent * event) {
     if (_isContinue) {
-        _tap2->setVisible(true);
         CCPoint location =
         this->getParent()->
         convertTouchToNodeSpace((CCTouch*)( pTouches->anyObject()));
         if (_tap->boundingBox().containsPoint(location)) {
             _dt = 1;
+            _tap2->setVisible(true);
             this->schedule( schedule_selector(GameLayer::updateBrige), 0.1 );
         }
 
@@ -155,34 +155,35 @@ void GameLayer::ccTouchesMoved(CCSet *pTouches, CCEvent * event) {
 
 void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
     if (_isContinue) {
+        _isContinue = false;
         _tap2->setVisible(false);
         float withLine = _line->getContentSize().height * _dt;
-        CCPoint treeBackPoint = ccp(_mario->getPositionX(), 200);// -
-                                   // _tree1->getContentSize().width, 200);
-        CCPoint treeBackPoint2 = ccp(_mario->getPositionX(), 200);// -
-                                   //  _tree2->getContentSize().width, 200);
+        CCPoint treeBackPoint = ccp(_mario->getPositionX(), 200);
+        CCPoint treeBackPoint2 = ccp(_mario->getPositionX(), 200);
         CCPoint lineBackPoint = ccp(_mario->getPositionX() - withLine, 200);
-        
         CCPoint location =
-        this->getParent()->
-        convertTouchToNodeSpace((CCTouch*)( pTouches->anyObject()));
+            this->getParent()->
+                convertTouchToNodeSpace((CCTouch*)( pTouches->anyObject()));
+        
         if (_tap->boundingBox().containsPoint(location)) {
             this->unschedule( schedule_selector(GameLayer::updateBrige));
             CCRotateBy * rotate = CCRotateBy::create(0.1f, 90);
             _line->runAction(rotate);
             this->run();
             CCPoint taget = ccp(_mario->getPositionX() + withLine + 10, 200);
-            CCPoint finalTaget = ccp(_tree1->getPositionX(), 200);// +
-                                     //_tree1->getContentSize().width, 200);
-            CCPoint finalTaget2 = ccp(_tree2->getPositionX(), 200);// +
-                                     // _tree2->getContentSize().width, 200);
+            CCPoint finalTaget = ccp(_tree1->getPositionX(), 200);
+            CCPoint finalTaget2 = ccp(_tree2->getPositionX(), 200);
             CCMoveTo *move = CCMoveTo::create(3, taget);
             CCRect treeRect1 = _tree1->boundingBox();
             CCRect treeRect2 = _tree2->boundingBox();
             if (treeRect1.containsPoint(taget) || treeRect2.containsPoint(taget)) {
                 _score++;
                 int b = _score / 3;
+                if (b >= 5) {
+                    b = rand() % 5;
+                }
                 int a = 0;
+                CCCallFuncN *endtouch = CCCallFuncN::create(this,callfuncN_selector(GameLayer::endTouch));
                 if (treeRect1.containsPoint(taget)) {
                     CCMoveTo *finalMove = CCMoveTo::create(4, finalTaget);
                     CCDelayTime * delay = CCDelayTime::create(4);
@@ -204,14 +205,14 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     _line->setPosition(_lineRoot);
                     
                     _tree2->setPosition(ccp((680 + _tree2->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
-                    _tree2->setScaleX(1 - (b + 1) * 0.2);
+                    _tree2->setScaleX(1 - b * 0.2);
                     
                     do {
                         a = rand() % 680;
                     } while (a <= _tree2->getContentSize().width / (b +1) + 30);
-                    CCDelayTime *delay2 = CCDelayTime::create(5);
-                    CCMoveBy *moveBy = CCMoveBy::create(2, ccp(-a, 0));
-                    CCSequence *sq4 = CCSequence::create(delay2, moveBy, NULL);
+                    CCDelayTime *delay2 = CCDelayTime::create(4);
+                    CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
+                    CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
                     _tree2->runAction(sq4);
                     
                 } else {
@@ -236,12 +237,12 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     
                     _tree1->setPosition(ccp((680 + _tree1->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
                     _tree1->setScaleX(1 - (b + 1) * 0.2);
-                    CCDelayTime *delay2 = CCDelayTime::create(5);
+                    CCDelayTime *delay2 = CCDelayTime::create(4);
                     do {
                         a = rand() % 680;
                     } while (a <= _tree1->getContentSize().width / (b +1) + 30);
-                    CCMoveBy *moveBy = CCMoveBy::create(2, ccp(-a, 0));
-                    CCSequence *sq4 = CCSequence::create(delay2, moveBy, NULL);
+                    CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
+                    CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
                     _tree1->runAction(sq4);
                 }
             } else {
@@ -253,20 +254,14 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                 CCSequence * sq2 = CCSequence::create(delay,rotate, NULL);
                 _line->runAction(sq2);
             }
- //           CCLOG("in ra b %f",float(1.0f / (b + 1)));
         }
-        CCLOG("diem so: %d", _score);
-        CCLOG("vi tri1 %f, vi tri2 %f", _tree1->getPositionX(), _tree2->getPositionX());
     }
 }
-
+void GameLayer::endTouch(cocos2d::CCNode *node) {
+    this->_isContinue = true;
+}
 void GameLayer::closeCallback(CCObject* pSender)
 {
-//    CCDirector::sharedDirector()->end();
-//    
-//#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-//    exit(0);
-//#endif
     _pauseLayer->setVisible(true);
     _isContinue = false;
 }
@@ -282,5 +277,5 @@ void GameLayer::onRestart(CCObject * pSender) {
 }
 
 void GameLayer::onQuit(CCObject * pSender) {
-    CCDirector::sharedDirector()->runWithScene(HelloWorld::scene());
+    CCDirector::sharedDirector()->replaceScene(StartGame::scene());
 }
