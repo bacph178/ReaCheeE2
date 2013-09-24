@@ -12,6 +12,7 @@
 #include <iostream>
 #include "cocos2d.h"
 #include "HelloWorldScene.h"
+#include "StartGame.h"
 
 using namespace cocos2d;
 
@@ -53,6 +54,9 @@ public:
     virtual void ccTouchesMoved(CCSet* pTouches, CCEvent* event);
     virtual void ccTouchesEnded(CCSet* pTouches, CCEvent* event);
     void closeCallback(CCObject* pSender);
+    
+    void endTouch(CCNode * node);
+    
     CREATE_FUNC(GameLayer);
 };
 
