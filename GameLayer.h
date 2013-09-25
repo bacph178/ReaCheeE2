@@ -25,6 +25,10 @@ private:
     CCSprite *_tree1;
     CCSprite *_tree2;
     CCSprite *_pauseLayer;
+    CCSprite *_endLayer;
+    
+    CCLabelTTF *_scoreLabel;
+    CCLabelTTF *_endScore;
     
     CCPoint _marioRoot;
     CCPoint _lineRoot;
@@ -47,6 +51,7 @@ public:
     void menuCloseCallback(CCObject * pSender);
     void run();
     void updateBrige(float dt);
+    void updateScore(float dt);
     void onContinue(CCObject * pSender);
     void onRestart(CCObject * pSender);
     void onQuit(CCObject * pSender);
@@ -56,6 +61,7 @@ public:
     void closeCallback(CCObject* pSender);
     
     void endTouch(CCNode * node);
+    void setEndGame(CCNode * node);
     
     CREATE_FUNC(GameLayer);
 };

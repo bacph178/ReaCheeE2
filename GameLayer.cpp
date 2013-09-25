@@ -38,6 +38,16 @@ bool GameLayer::init(){
     background->setPosition(ccp(_width / 2, _height / 2));
     this->addChild(background);
     
+    CCSprite *table_mark = CCSprite::create("table_mark.png");
+    table_mark->setAnchorPoint(ccp(0.5, 0.5));
+    table_mark->setPosition(ccp(_width / 2, 900 * _SIZE_RATIO_Y));
+    this->addChild(table_mark);
+    
+    _scoreLabel = CCLabelTTF::create("00", "Time new Roman", 50);
+    _scoreLabel->setPosition(ccp(_width / 2, 870 * _SIZE_RATIO_Y));
+    _scoreLabel->setColor(ccc3(0, 0, 0));
+    this->addChild(_scoreLabel);
+    
     _mario = CCSprite::create("1.png");
     _mario->setAnchorPoint(ccp(0.5, 0));
     _mario->setPosition(_marioRoot);
@@ -92,19 +102,43 @@ bool GameLayer::init(){
     CCMenu *pauseMenu = CCMenu::create(continueItem, restartItem, quitItem, NULL);
     pauseMenu->setPosition(ccp(0, 0));
     _pauseLayer->addChild(pauseMenu);
-    this->addChild(_pauseLayer);
+    this->addChild(_pauseLayer,1);
     _pauseLayer->setVisible(false);
     
+    //end Layer
+    _endLayer = CCSprite::create("frame_small.png");
+    _endLayer->setScale(_SIZE_RATIO);
+    _endLayer->setAnchorPoint(ccp(0.5, 1));
+    _endLayer->setPosition(ccp(_width / 2, _height));
+    
+    _endScore = CCLabelTTF::create("00", "Time New Roman", 200);
+    _endScore->setPosition(_endLayer->convertToNodeSpace(ccp(320 * _SIZE_RATIO_X, 650 * _SIZE_RATIO_Y)));
+    _endScore->setColor(ccc3(0, 0, 0));
+    _endLayer->addChild(_endScore);
+    CCMenuItemImage * restart = CCMenuItemImage::create("restart_small.png", "restart_small.png",
+                                                        this, menu_selector(GameLayer::onRestart));
+    restart->setPosition(_endLayer->convertToNodeSpace(ccp(-135 * _SIZE_RATIO_X, -100 * _SIZE_RATIO_Y)));
+    CCMenuItemImage * quit = CCMenuItemImage::create("quit_small.png", "quit_small.png",
+                                                     this, menu_selector(GameLayer::onQuit));
+    quit->setPosition(_endLayer->convertToNodeSpace(ccp(145 * _SIZE_RATIO_X, -100 * _SIZE_RATIO_Y)));
+    CCMenu * endMenu = CCMenu::create(restart, quit, NULL);
+   // endMenu->setPosition(ccp(0, 0));
+    _endLayer->addChild(endMenu);
+    this->addChild(_endLayer, 1);
+    _endLayer->setVisible(false);
+    
+    
     CCMenuItemImage *pCloseItem =
-    CCMenuItemImage::create("CloseNormal.png", "CloseSelected.png",
+    CCMenuItemImage::create("menu.png", "menu.png",
                             this,menu_selector(GameLayer::closeCallback));
     pCloseItem->
-    setPosition(ccp(CCDirector::sharedDirector()->getWinSize().width - 20, 20));
+    setPosition(ccp(600 * _SIZE_RATIO_X, 900 * _SIZE_RATIO_Y));
     
     // create menu, it's an autorelease object
     CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
     pMenu->setPosition( CCPointZero );
-    this->addChild(pMenu, 1);
+    this->addChild(pMenu);
+    this->schedule( schedule_selector(GameLayer::updateScore), 0.1 );
     
     this->setTouchEnabled(true);
     return true;
@@ -190,10 +224,12 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCMoveTo *marioBack = CCMoveTo::create(1, _marioRoot);
                     CCSequence *sq = CCSequence::create(finalMove, marioBack, NULL);
                     _mario->runAction(sq);
+                    sq->autorelease();
                     
                     CCMoveTo *treeBack = CCMoveTo::create(1, treeBackPoint);
                     CCSequence *sq2 = CCSequence::create(delay, treeBack, NULL);
                     _tree1->runAction(sq2);
+                    sq2->autorelease();
                     
                     CCMoveTo *lineBack = CCMoveTo::create(1, lineBackPoint);
                     CCScaleTo * scale = CCScaleTo::create(0, 0);
@@ -202,6 +238,7 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCSequence *sq3 = CCSequence::create(delay, lineBack, scale,
                                                          lineBack1, rotate1, NULL);
                     _line->runAction(sq3);
+                    sq3->autorelease();
                     _line->setPosition(_lineRoot);
                     
                     _tree2->setPosition(ccp((680 + _tree2->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
@@ -214,17 +251,19 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
                     CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
                     _tree2->runAction(sq4);
-                    
+                    sq4->autorelease();
                 } else {
                     CCMoveTo *finalMove = CCMoveTo::create(4, finalTaget2);
                     CCDelayTime * delay = CCDelayTime::create(4);
                     CCMoveTo *marioBack = CCMoveTo::create(1, _marioRoot);
                     CCSequence *sq = CCSequence::create(finalMove, marioBack, NULL);
                     _mario->runAction(sq);
+                    sq->autorelease();
                     
                     CCMoveTo *treeBack = CCMoveTo::create(1, treeBackPoint2);
                     CCSequence *sq2 = CCSequence::create(delay, treeBack, NULL);
                     _tree2->runAction(sq2);
+                    sq2->autorelease();
                     
                     CCMoveTo *lineBack = CCMoveTo::create(1, lineBackPoint);
                     CCScaleTo * scale = CCScaleTo::create(0, 0);
@@ -233,6 +272,7 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCSequence *sq3 = CCSequence::create(delay, lineBack, scale,
                                                          lineBack1, rotate1, NULL);
                     _line->runAction(sq3);
+                    sq3->autorelease();
                     _line->setPosition(_lineRoot);
                     
                     _tree1->setPosition(ccp((680 + _tree1->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
@@ -244,26 +284,36 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
                     CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
                     _tree1->runAction(sq4);
+                    sq4->autorelease();
                 }
             } else {
+                CCCallFuncN *endGame = CCCallFuncN::create(this,callfuncN_selector(GameLayer::setEndGame));
                 CCPoint tagetdow = ccp(_mario->getPositionX() + withLine + 10, 0);
                 CCMoveTo *movedown = CCMoveTo::create(3, tagetdow);
-                CCSequence *sq = CCSequence::create(move, movedown, NULL);
+                CCSequence *sq = CCSequence::create(move, movedown, endGame, NULL);
                 _mario->runAction(sq);
+                sq->autorelease();
                 CCDelayTime * delay = CCDelayTime::create(3);
-                CCSequence * sq2 = CCSequence::create(delay,rotate, NULL);
+                CCSequence * sq2 = CCSequence::create(delay, rotate, NULL);
                 _line->runAction(sq2);
+                sq2->autorelease();
             }
         }
     }
 }
-void GameLayer::endTouch(cocos2d::CCNode *node) {
+void GameLayer::endTouch(CCNode *node) {
     this->_isContinue = true;
+}
+
+void GameLayer::setEndGame(CCNode *node) {
+    _endLayer->setVisible(true);
 }
 void GameLayer::closeCallback(CCObject* pSender)
 {
-    _pauseLayer->setVisible(true);
-    _isContinue = false;
+    if (_isContinue) {
+        _pauseLayer->setVisible(true);
+        _isContinue = false;
+    }
 }
 
 void GameLayer::onContinue(CCObject * pSender) {
@@ -272,10 +322,16 @@ void GameLayer::onContinue(CCObject * pSender) {
 }
 
 void GameLayer::onRestart(CCObject * pSender) {
-    _score = 0;
-    _pauseLayer->setVisible(false);
+    CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void GameLayer::onQuit(CCObject * pSender) {
     CCDirector::sharedDirector()->replaceScene(StartGame::scene());
+}
+
+void GameLayer::updateScore(float dt) {
+    char scoreBuf[20] = {0};
+    if (_score < 10) sprintf(scoreBuf, "0%d", _score);
+    else sprintf(scoreBuf, "%d", _score);
+    _scoreLabel->setString(scoreBuf);
 }
