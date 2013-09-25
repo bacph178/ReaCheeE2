@@ -11,7 +11,7 @@
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h"
 #include "HelloWorldScene.h"
-#include "GameLayer.h"
+#include "StartGame.h"
 
 USING_NS_CC;
 using namespace CocosDenshion;
@@ -38,7 +38,7 @@ bool AppDelegate::applicationDidFinishLaunching()
     pDirector->setAnimationInterval(1.0 / 60);
 
     // create a scene. it's an autorelease object
-    CCScene *pScene = GameLayer::scene();
+    CCScene *pScene = StartGame::scene();
 
     // run
     pDirector->runWithScene(pScene);
