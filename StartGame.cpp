@@ -35,6 +35,11 @@ bool StartGame::init() {
     _SIZE_RATIO_X = _width / 640;
     _SIZE_RATIO_Y = _height / 960;
     
+    CCSprite *background = CCSprite::create("bg_home.png");
+    background->setAnchorPoint(ccp(0.5, 0.5));
+    background->setPosition(ccp(_width / 2, _height / 2));
+    this->addChild(background);
+    
     CCMenuItemImage *startButton = CCMenuItemImage::create(
                                                           "start.png",
                                                           "start.png",
@@ -89,19 +94,23 @@ void StartGame::onStart(CCObject* pSender) {
 }
 
 void StartGame::onNormal(CCObject* pSender) {
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 1);
     CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onHard(CCObject* pSender) {
-
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 2);
+    CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onSensitive(CCObject* pSender) {
-
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 3);
+    CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onStealth(CCObject* pSender) {
-
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 4);
+    CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onBack(CCObject* pSender) {
