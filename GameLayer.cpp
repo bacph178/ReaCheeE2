@@ -62,7 +62,13 @@ bool GameLayer::init(){
     _tree1->setAnchorPoint(ccp(1, 1));
     _tree1->setPosition(ccp(300 * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
     this->addChild(_tree1);
-    
+    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 4) {
+        CCScaleTo *scale = CCScaleTo::create(0.1, 1);
+        CCCallFuncN *stealth = CCCallFuncN::create(this,callfuncN_selector(GameLayer::stealthCallBack));
+        CCSequence *tree1 = CCSequence::create(scale, stealth, NULL);
+        _tree1->runAction(tree1);
+    }
+
     _tree2 = CCSprite::create("line.png");
     _tree2->setAnchorPoint(ccp(1, 1));
     this->addChild(_tree2);
@@ -165,9 +171,11 @@ void GameLayer::run() {
 
 void GameLayer::updateBrige(float dt) {
     _dt++;
-    _line->setScaleY(_dt);
-    _line->setScaleX(1);
-    
+    int a = CCUserDefault::sharedUserDefault()->getIntegerForKey("level");
+    if (a != 3) {
+        _line->setScaleY(_dt);
+        _line->setScaleX(1);
+    }
 }
 
 void GameLayer::ccTouchesBegan(CCSet *pTouches, CCEvent * event) {
@@ -201,8 +209,16 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
         
         if (_tap->boundingBox().containsPoint(location)) {
             this->unschedule( schedule_selector(GameLayer::updateBrige));
+            _tree1->setVisible(true);
+            _tree2->setVisible(true);
             CCRotateBy * rotate = CCRotateBy::create(0.1f, 90);
-            _line->runAction(rotate);
+            if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 3) {
+                CCCallFuncN *sen = CCCallFuncN::create(this,callfuncN_selector(GameLayer::sensitiveCallBack));
+                CCSequence *lineSq = CCSequence::create(sen, rotate, NULL);
+                _line->runAction(lineSq);
+            } else {
+                _line->runAction(rotate);
+            }
             this->run();
             CCPoint taget = ccp(_mario->getPositionX() + withLine + 10, 200);
             CCPoint finalTaget = ccp(_tree1->getPositionX(), 200);
@@ -224,12 +240,10 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCMoveTo *marioBack = CCMoveTo::create(1, _marioRoot);
                     CCSequence *sq = CCSequence::create(finalMove, marioBack, NULL);
                     _mario->runAction(sq);
-                    sq->autorelease();
                     
                     CCMoveTo *treeBack = CCMoveTo::create(1, treeBackPoint);
                     CCSequence *sq2 = CCSequence::create(delay, treeBack, NULL);
                     _tree1->runAction(sq2);
-                    sq2->autorelease();
                     
                     CCMoveTo *lineBack = CCMoveTo::create(1, lineBackPoint);
                     CCScaleTo * scale = CCScaleTo::create(0, 0);
@@ -238,7 +252,6 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCSequence *sq3 = CCSequence::create(delay, lineBack, scale,
                                                          lineBack1, rotate1, NULL);
                     _line->runAction(sq3);
-                    sq3->autorelease();
                     _line->setPosition(_lineRoot);
                     
                     _tree2->setPosition(ccp((680 + _tree2->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
@@ -249,21 +262,24 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     } while (a <= _tree2->getContentSize().width / (b +1) + 30);
                     CCDelayTime *delay2 = CCDelayTime::create(4);
                     CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
-                    CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
-                    _tree2->runAction(sq4);
-                    sq4->autorelease();
+                    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 4) {
+                        CCCallFuncN *stealth = CCCallFuncN::create(this,callfuncN_selector(GameLayer::stealthCallBack2));
+                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, stealth, NULL);
+                        _tree2->runAction(sq4);
+                    } else {
+                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
+                        _tree2->runAction(sq4);
+                    }
                 } else {
                     CCMoveTo *finalMove = CCMoveTo::create(4, finalTaget2);
                     CCDelayTime * delay = CCDelayTime::create(4);
                     CCMoveTo *marioBack = CCMoveTo::create(1, _marioRoot);
                     CCSequence *sq = CCSequence::create(finalMove, marioBack, NULL);
                     _mario->runAction(sq);
-                    sq->autorelease();
                     
                     CCMoveTo *treeBack = CCMoveTo::create(1, treeBackPoint2);
                     CCSequence *sq2 = CCSequence::create(delay, treeBack, NULL);
                     _tree2->runAction(sq2);
-                    sq2->autorelease();
                     
                     CCMoveTo *lineBack = CCMoveTo::create(1, lineBackPoint);
                     CCScaleTo * scale = CCScaleTo::create(0, 0);
@@ -272,7 +288,6 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCSequence *sq3 = CCSequence::create(delay, lineBack, scale,
                                                          lineBack1, rotate1, NULL);
                     _line->runAction(sq3);
-                    sq3->autorelease();
                     _line->setPosition(_lineRoot);
                     
                     _tree1->setPosition(ccp((680 + _tree1->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
@@ -282,9 +297,14 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                         a = rand() % 680;
                     } while (a <= _tree1->getContentSize().width / (b +1) + 30);
                     CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
-                    CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
-                    _tree1->runAction(sq4);
-                    sq4->autorelease();
+                    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 4) {
+                        CCCallFuncN *stealth = CCCallFuncN::create(this,callfuncN_selector(GameLayer::stealthCallBack));
+                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, stealth, NULL);
+                        _tree1->runAction(sq4);
+                    } else {
+                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
+                        _tree1->runAction(sq4);
+                    }
                 }
             } else {
                 CCCallFuncN *endGame = CCCallFuncN::create(this,callfuncN_selector(GameLayer::setEndGame));
@@ -292,11 +312,9 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                 CCMoveTo *movedown = CCMoveTo::create(3, tagetdow);
                 CCSequence *sq = CCSequence::create(move, movedown, endGame, NULL);
                 _mario->runAction(sq);
-                sq->autorelease();
                 CCDelayTime * delay = CCDelayTime::create(3);
                 CCSequence * sq2 = CCSequence::create(delay, rotate, NULL);
                 _line->runAction(sq2);
-                sq2->autorelease();
             }
         }
     }
@@ -334,4 +352,18 @@ void GameLayer::updateScore(float dt) {
     if (_score < 10) sprintf(scoreBuf, "0%d", _score);
     else sprintf(scoreBuf, "%d", _score);
     _scoreLabel->setString(scoreBuf);
+    _endScore->setString(scoreBuf);
+}
+
+void GameLayer::sensitiveCallBack(CCNode *node) {
+    _line->setScaleY(_dt);
+    _line->setScaleX(1);
+}
+
+void GameLayer::stealthCallBack(CCNode * node) {
+    _tree1->setVisible(false);
+}
+
+void GameLayer::stealthCallBack2(CCNode * node) {
+    _tree2->setVisible(false);
 }

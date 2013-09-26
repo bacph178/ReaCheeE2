@@ -36,6 +36,7 @@ private:
     CCSize _size;
     
     bool _isContinue;
+    bool _isStealth;
     
     float _dt;
     float _width;
@@ -62,6 +63,9 @@ public:
     
     void endTouch(CCNode * node);
     void setEndGame(CCNode * node);
+    void sensitiveCallBack(CCNode * node);
+    void stealthCallBack(CCNode * node);
+    void stealthCallBack2(CCNode * node);
     
     CREATE_FUNC(GameLayer);
 };

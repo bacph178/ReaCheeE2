@@ -94,19 +94,23 @@ void StartGame::onStart(CCObject* pSender) {
 }
 
 void StartGame::onNormal(CCObject* pSender) {
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 1);
     CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onHard(CCObject* pSender) {
-
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 2);
+    CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onSensitive(CCObject* pSender) {
-
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 3);
+    CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onStealth(CCObject* pSender) {
-
+    CCUserDefault::sharedUserDefault()->setIntegerForKey("level", 4);
+    CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
 }
 
 void StartGame::onBack(CCObject* pSender) {
