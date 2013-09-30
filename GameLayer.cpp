@@ -58,7 +58,9 @@ bool GameLayer::init(){
     marioTree->setPosition(_lineRoot);
     this->addChild(marioTree);
     
-    _tree1 = CCSprite::create("line.png");
+    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 2) {
+        _tree1 = CCSprite::create("line01.png");
+    } else _tree1 = CCSprite::create("line.png");
     _tree1->setAnchorPoint(ccp(1, 1));
     _tree1->setPosition(ccp(300 * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
     this->addChild(_tree1);
@@ -69,7 +71,9 @@ bool GameLayer::init(){
         _tree1->runAction(tree1);
     }
 
-    _tree2 = CCSprite::create("line.png");
+    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 2) {
+        _tree2 = CCSprite::create("line01.png");
+    } else _tree2 = CCSprite::create("line.png");
     _tree2->setAnchorPoint(ccp(1, 1));
     this->addChild(_tree2);
     
@@ -96,15 +100,21 @@ bool GameLayer::init(){
     _pauseLayer->setAnchorPoint(ccp(0.5, 1));
     _pauseLayer->setPosition(ccp(_width / 2, _height));
     
-    CCMenuItemImage * continueItem = CCMenuItemImage::create("continue.png", "continue.png",
-                                                        this, menu_selector(GameLayer::onContinue));
-    continueItem->setPosition(_pauseLayer->convertToNodeSpace(ccp(_width / 2, _height * 3.6 / 5)));
-    CCMenuItemImage * restartItem = CCMenuItemImage::create("restart.png", "restart.png",
-                                                            this, menu_selector(GameLayer::onRestart));
-    restartItem->setPosition(_pauseLayer->convertToNodeSpace(ccp(_width / 2, _height * 2.8 / 5)));
-    CCMenuItemImage * quitItem = CCMenuItemImage::create("quit.png", "quit.png",
-                                                         this, menu_selector(GameLayer::onQuit));
-    quitItem->setPosition(_pauseLayer->convertToNodeSpace(ccp(_width / 2, _height*2 / 5)));
+    CCMenuItemImage * continueItem =
+    CCMenuItemImage::create("continue.png","continue.png", this,
+                            menu_selector(GameLayer::onContinue));
+    continueItem->setPosition(_pauseLayer->
+                              convertToNodeSpace(ccp(_width / 2, _height * 3.6 / 5)));
+    CCMenuItemImage * restartItem =
+    CCMenuItemImage::create("restart.png", "restart.png", this,
+                            menu_selector(GameLayer::onRestart));
+    restartItem->setPosition(_pauseLayer->
+                             convertToNodeSpace(ccp(_width / 2, _height * 2.8 / 5)));
+    CCMenuItemImage * quitItem =
+    CCMenuItemImage::create("quit.png", "quit.png", this,
+                            menu_selector(GameLayer::onQuit));
+    quitItem->setPosition(_pauseLayer->
+                          convertToNodeSpace(ccp(_width / 2, _height*2 / 5)));
     CCMenu *pauseMenu = CCMenu::create(continueItem, restartItem, quitItem, NULL);
     pauseMenu->setPosition(ccp(0, 0));
     _pauseLayer->addChild(pauseMenu);
@@ -118,27 +128,51 @@ bool GameLayer::init(){
     _endLayer->setPosition(ccp(_width / 2, _height));
     
     _endScore = CCLabelTTF::create("00", "Time New Roman", 200);
-    _endScore->setPosition(_endLayer->convertToNodeSpace(ccp(320 * _SIZE_RATIO_X, 650 * _SIZE_RATIO_Y)));
+    _endScore->setPosition(_endLayer->convertToNodeSpace(ccp(320 * _SIZE_RATIO_X,
+                                                             680 * _SIZE_RATIO_Y)));
     _endScore->setColor(ccc3(0, 0, 0));
     _endLayer->addChild(_endScore);
-    CCMenuItemImage * restart = CCMenuItemImage::create("restart_small.png", "restart_small.png",
-                                                        this, menu_selector(GameLayer::onRestart));
-    restart->setPosition(_endLayer->convertToNodeSpace(ccp(-135 * _SIZE_RATIO_X, -100 * _SIZE_RATIO_Y)));
-    CCMenuItemImage * quit = CCMenuItemImage::create("quit_small.png", "quit_small.png",
-                                                     this, menu_selector(GameLayer::onQuit));
-    quit->setPosition(_endLayer->convertToNodeSpace(ccp(145 * _SIZE_RATIO_X, -100 * _SIZE_RATIO_Y)));
+    
+    CCLabelTTF *scoreLabel = CCLabelTTF::create("SCORE", "Time New Roman", 80);
+    scoreLabel->setPosition(_endLayer->convertToNodeSpace(ccp(320 * _SIZE_RATIO_X,
+                                                              800 * _SIZE_RATIO_Y)));
+    scoreLabel->setColor(ccc3(0, 0, 0));
+    _endLayer->addChild(scoreLabel);
+    
+    _rankLabel = CCLabelTTF::create("RANK : NO RANK", "Time new Roman", 60);
+    _rankLabel->setPosition(_endLayer->convertToNodeSpace(ccp(320 * _SIZE_RATIO_X,
+                                                              550 * _SIZE_RATIO_Y)));
+    _rankLabel->setColor(ccc3(0, 0, 0));
+    _endLayer->addChild(_rankLabel);
+    
+    _topLabel = CCLabelTTF::create("", "Time New Roman", 50);
+    _topLabel->setPosition(_endLayer->convertToNodeSpace(ccp(320 * _SIZE_RATIO_X,
+                                                              470 * _SIZE_RATIO_Y)));
+    _topLabel->setColor(ccc3(0, 0, 0));
+    _endLayer->addChild(_topLabel);
+    
+    
+    
+    CCMenuItemImage * restart =
+    CCMenuItemImage::create("restart_small.png", "restart_small.png", this,
+                            menu_selector(GameLayer::onRestart));
+    restart->setPosition(_endLayer->convertToNodeSpace(ccp(-135 * _SIZE_RATIO_X,
+                                                           -100 * _SIZE_RATIO_Y)));
+    CCMenuItemImage * quit =
+    CCMenuItemImage::create("quit_small.png", "quit_small.png", this,
+                            menu_selector(GameLayer::onQuit));
+    quit->setPosition(_endLayer->convertToNodeSpace(ccp(145 * _SIZE_RATIO_X,
+                                                        -100 * _SIZE_RATIO_Y)));
     CCMenu * endMenu = CCMenu::create(restart, quit, NULL);
-   // endMenu->setPosition(ccp(0, 0));
     _endLayer->addChild(endMenu);
     this->addChild(_endLayer, 1);
     _endLayer->setVisible(false);
     
     
     CCMenuItemImage *pCloseItem =
-    CCMenuItemImage::create("menu.png", "menu.png",
-                            this,menu_selector(GameLayer::closeCallback));
-    pCloseItem->
-    setPosition(ccp(600 * _SIZE_RATIO_X, 900 * _SIZE_RATIO_Y));
+    CCMenuItemImage::create("menu.png", "menu.png", this,
+                            menu_selector(GameLayer::closeCallback));
+    pCloseItem->setPosition(ccp(600 * _SIZE_RATIO_X, 900 * _SIZE_RATIO_Y));
     
     // create menu, it's an autorelease object
     CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
@@ -213,7 +247,8 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
             _tree2->setVisible(true);
             CCRotateBy * rotate = CCRotateBy::create(0.1f, 90);
             if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 3) {
-                CCCallFuncN *sen = CCCallFuncN::create(this,callfuncN_selector(GameLayer::sensitiveCallBack));
+                CCCallFuncN *sen =
+                CCCallFuncN::create(this,callfuncN_selector(GameLayer::sensitiveCallBack));
                 CCSequence *lineSq = CCSequence::create(sen, rotate, NULL);
                 _line->runAction(lineSq);
             } else {
@@ -233,7 +268,8 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     b = rand() % 5;
                 }
                 int a = 0;
-                CCCallFuncN *endtouch = CCCallFuncN::create(this,callfuncN_selector(GameLayer::endTouch));
+                CCCallFuncN *endtouch =
+                CCCallFuncN::create(this, callfuncN_selector(GameLayer::endTouch));
                 if (treeRect1.containsPoint(taget)) {
                     CCMoveTo *finalMove = CCMoveTo::create(4, finalTaget);
                     CCDelayTime * delay = CCDelayTime::create(4);
@@ -253,9 +289,16 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                                                          lineBack1, rotate1, NULL);
                     _line->runAction(sq3);
                     _line->setPosition(_lineRoot);
-                    
-                    _tree2->setPosition(ccp((680 + _tree2->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
-                    _tree2->setScaleX(1 - b * 0.2);
+                    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") != 2) {
+                        _tree2->
+                        setPosition(ccp((680 + _tree2->getContentSize().width / (b + 1)) * _SIZE_RATIO_X,
+                                        200 * _SIZE_RATIO_Y));
+                        _tree2->setScaleX(1 - b * 0.2);
+                    } else {
+                        _tree2->
+                        setPosition(ccp((680 + _tree2->getContentSize().width) * _SIZE_RATIO_X,
+                                        200 * _SIZE_RATIO_Y));
+                    }
                     
                     do {
                         a = rand() % 680;
@@ -263,11 +306,15 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     CCDelayTime *delay2 = CCDelayTime::create(4);
                     CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
                     if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 4) {
-                        CCCallFuncN *stealth = CCCallFuncN::create(this,callfuncN_selector(GameLayer::stealthCallBack2));
-                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, stealth, NULL);
+                        CCCallFuncN *stealth =
+                        CCCallFuncN::create(this,
+                                            callfuncN_selector(GameLayer::stealthCallBack2));
+                        CCSequence *sq4 =
+                        CCSequence::create(delay2, moveBy, endtouch, stealth, NULL);
                         _tree2->runAction(sq4);
                     } else {
-                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
+                        CCSequence *sq4 =
+                        CCSequence::create(delay2, moveBy, endtouch, NULL);
                         _tree2->runAction(sq4);
                     }
                 } else {
@@ -290,24 +337,38 @@ void GameLayer::ccTouchesEnded(CCSet *pTouches, CCEvent * event) {
                     _line->runAction(sq3);
                     _line->setPosition(_lineRoot);
                     
-                    _tree1->setPosition(ccp((680 + _tree1->getContentSize().width / (b + 1)) * _SIZE_RATIO_X, 200 * _SIZE_RATIO_Y));
-                    _tree1->setScaleX(1 - (b + 1) * 0.2);
+                    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 3) {
+                        _tree1->
+                        setPosition(ccp((680 + _tree1->getContentSize().width / (b + 1)) * _SIZE_RATIO_X,
+                                        200 * _SIZE_RATIO_Y));
+                        _tree1->setScaleX(1 - (b + 1) * 0.2);
+                    } else {
+                        _tree1->
+                        setPosition(ccp((680 + _tree1->getContentSize().width) * _SIZE_RATIO_X,
+                                        200 * _SIZE_RATIO_Y));
+                    }
                     CCDelayTime *delay2 = CCDelayTime::create(4);
                     do {
                         a = rand() % 680;
                     } while (a <= _tree1->getContentSize().width / (b +1) + 30);
                     CCMoveBy *moveBy = CCMoveBy::create(1, ccp(-a, 0));
                     if (CCUserDefault::sharedUserDefault()->getIntegerForKey("level") == 4) {
-                        CCCallFuncN *stealth = CCCallFuncN::create(this,callfuncN_selector(GameLayer::stealthCallBack));
-                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, stealth, NULL);
+                        CCCallFuncN *stealth =
+                        CCCallFuncN::create(this,
+                                            callfuncN_selector(GameLayer::stealthCallBack));
+                        CCSequence *sq4 =
+                        CCSequence::create(delay2, moveBy, endtouch, stealth, NULL);
                         _tree1->runAction(sq4);
                     } else {
-                        CCSequence *sq4 = CCSequence::create(delay2, moveBy, endtouch, NULL);
+                        CCSequence *sq4 =
+                        CCSequence::create(delay2, moveBy, endtouch, NULL);
                         _tree1->runAction(sq4);
                     }
                 }
             } else {
-                CCCallFuncN *endGame = CCCallFuncN::create(this,callfuncN_selector(GameLayer::setEndGame));
+                this->score();
+                CCCallFuncN *endGame =
+                CCCallFuncN::create(this,callfuncN_selector(GameLayer::setEndGame));
                 CCPoint tagetdow = ccp(_mario->getPositionX() + withLine + 10, 0);
                 CCMoveTo *movedown = CCMoveTo::create(3, tagetdow);
                 CCSequence *sq = CCSequence::create(move, movedown, endGame, NULL);
@@ -366,4 +427,40 @@ void GameLayer::stealthCallBack(CCNode * node) {
 
 void GameLayer::stealthCallBack2(CCNode * node) {
     _tree2->setVisible(false);
+}
+
+void GameLayer::score() {
+    int level = CCUserDefault::sharedUserDefault()->getIntegerForKey("level");
+    int i = (level - 1) * 10 + 1;
+    int j;
+    char rankBuf[20] = {0};
+    for (j = i; j <= level * 10; j++) {
+        sprintf(rankBuf, "%d",j);
+        if (CCUserDefault::sharedUserDefault()->getIntegerForKey(rankBuf) < _score) {
+            break;
+        }
+    }
+    if (j < level * 10 + 1) {
+        sprintf(rankBuf, "%d", j);
+        char rank[20] = {0};
+        sprintf(rank, "RANK : %d", j % 10);
+        _rankLabel->setString(rank);
+        CCUserDefault::sharedUserDefault()->setIntegerForKey(rankBuf, _score);
+        j = j + 1;
+        while (j < level * 10 + 1) {
+            sprintf(rankBuf, "%d", j);
+            char rankBuf2[20] = {0};
+            sprintf(rankBuf2, "%d", j + 1);
+            CCUserDefault::sharedUserDefault()->
+            setIntegerForKey(rankBuf,
+                             CCUserDefault::sharedUserDefault()->
+                             getIntegerForKey(rankBuf2));
+            j++;
+        }
+    } else {
+        int a = CCUserDefault::sharedUserDefault()->getIntegerForKey(rankBuf) - _score;
+        char enough[20] = {0};
+        sprintf(enough, "TOP 10 : enough %d",a);
+        _topLabel->setString(enough);
+    }
 }
