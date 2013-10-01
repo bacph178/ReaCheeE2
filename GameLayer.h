@@ -13,6 +13,7 @@
 #include "cocos2d.h"
 #include "HelloWorldScene.h"
 #include "StartGame.h"
+#include "RankingScene.h"
 
 using namespace cocos2d;
 
@@ -29,6 +30,8 @@ private:
     
     CCLabelTTF *_scoreLabel;
     CCLabelTTF *_endScore;
+    CCLabelTTF *_rankLabel;
+    CCLabelTTF *_topLabel;
     
     CCPoint _marioRoot;
     CCPoint _lineRoot;
@@ -66,6 +69,7 @@ public:
     void sensitiveCallBack(CCNode * node);
     void stealthCallBack(CCNode * node);
     void stealthCallBack2(CCNode * node);
+    void score();
     
     CREATE_FUNC(GameLayer);
 };
