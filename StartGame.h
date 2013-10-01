@@ -34,6 +34,8 @@ public:
     static cocos2d::CCScene* scene();
     // preprocessor macro for "static create()" constructor ( node() deprecated )
     void onStart(CCObject* pSender);
+    void onRank(CCObject* pSender);
+    void onQuit(CCObject* pSender);
     void onNormal(CCObject* pSender);
     void onHard(CCObject* pSender);
     void onSensitive(CCObject* pSender);
