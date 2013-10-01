@@ -85,8 +85,13 @@ bool RankingScene::init()
     _stealthOver->setPosition(stealth->getPosition());
     this->addChild(_stealthOver, 1);
     _stealthOver->setVisible(false);
+    
+    CCMenuItemImage * quit =
+    CCMenuItemImage::create("quit_small.png", "quit_small.png", this,
+                            menu_selector(RankingScene::onQuit));
+    quit->setPosition(ccp(_width / 2, 140 * _SIZE_RATIO_Y));
 
-    CCMenu * pMenu = CCMenu::create(normal, hard, sensitive, stealth, NULL);
+    CCMenu * pMenu = CCMenu::create(normal, hard, sensitive, stealth, quit, NULL);
     pMenu->setPosition( CCPointZero );
     this->addChild(pMenu);
 
@@ -95,16 +100,17 @@ bool RankingScene::init()
         char scoreBuf[10] = {0};
         sprintf(rankBuf, "%d", i + 1);
         sprintf(scoreBuf, "%d", CCUserDefault::sharedUserDefault()->getIntegerForKey(rankBuf));
-        _scoreLabel = CCLabelTTF::create(scoreBuf, "Time new Roman", 50);
+         CCLabelTTF * scoreLabel = CCLabelTTF::create(scoreBuf, "Time new Roman", 50);
         if (i < 5) {
-            _scoreLabel->setPosition(ccp(_width / 2.8,
+            scoreLabel->setPosition(ccp(_width / 2.8,
                                         (610 - 90 * (i % 5)) * _SIZE_RATIO_Y));
         } else {
-            _scoreLabel->setPosition(ccp(_width * 3.2 / 4,
+            scoreLabel->setPosition(ccp(_width * 3.2 / 4,
                                         (610 - 90 * (i % 5)) * _SIZE_RATIO_Y));
         }
-        this->addChild(_scoreLabel);
-        _array->addObject(_scoreLabel);
+        scoreLabel->setColor(ccc3(255, 0, 255));
+        this->addChild(scoreLabel);
+        _array->addObject(scoreLabel);
     }
 
     return true;
@@ -169,4 +175,8 @@ void RankingScene::onStealth(CCObject * pSender) {
         CCLabelTTF * scoreLabel = (CCLabelTTF *)_array->objectAtIndex(i);
         scoreLabel->setString(scoreBuf);
     }
+}
+
+void RankingScene::onQuit(CCObject *pSender) {
+    CCDirector::sharedDirector()->replaceScene(StartGame::scene());
 }

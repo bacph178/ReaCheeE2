@@ -11,13 +11,12 @@
 
 #include <iostream>
 #include "cocos2d.h"
+#include "StartGame.h"
 using namespace cocos2d;
 class RankingScene : public cocos2d::CCLayer
 {
 private:
     CCSize _size;
-    
-    CCLabelTTF * _scoreLabel;
     
     CCArray * _array;
     
@@ -41,6 +40,7 @@ public:
     void onHard(CCObject * pSender);
     void onSensitive(CCObject * pSender);
     void onStealth(CCObject * pSender);
+    void onQuit(CCObject * pSender);
     
     CREATE_FUNC(RankingScene);
 };
