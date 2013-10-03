@@ -40,15 +40,23 @@ bool StartGame::init() {
     background->setPosition(ccp(_width / 2, _height / 2));
     this->addChild(background);
     
-    CCMenuItemImage *startButton = CCMenuItemImage::create(
-                                                          "start.png",
-                                                          "start.png",
-                                                          this,
-                                                          menu_selector(StartGame::onStart));
+    CCMenuItemImage * startButton =
+    CCMenuItemImage::create("start.png", "start.png", this,
+                            menu_selector(StartGame::onStart));
     startButton->setPosition(ccp(_width / 2, _height /2));
     
+    CCMenuItemImage * rankButton =
+    CCMenuItemImage::create("rank.png", "rank.png", this,
+                            menu_selector(StartGame::onRank));
+    rankButton->setPosition(ccp(_width / 2, _height / 3));
+    
+    CCMenuItemImage * quitButton =
+    CCMenuItemImage::create("quit_small.png", "quit_small.png", this,
+                            menu_selector(StartGame::onQuit));
+    quitButton->setPosition(ccp(_width / 2, _height / 6));
+    
     // create menu, it's an autorelease object
-    CCMenu* pMenu = CCMenu::create(startButton, NULL);
+    CCMenu* pMenu = CCMenu::create(startButton, rankButton, quitButton, NULL);
     pMenu->setPosition( CCPointZero );
     this->addChild(pMenu);
     
@@ -58,39 +66,58 @@ bool StartGame::init() {
     _startLayer->setAnchorPoint(ccp(0.5, 1));
     _startLayer->setPosition(ccp(_width / 2, _height));
     
-    CCMenuItemImage * normalItem = CCMenuItemImage::create("normal.png", "normal.png",
-                                                             this, menu_selector(StartGame::onNormal));
-    normalItem->setPosition(_startLayer->convertToNodeSpace(ccp(_width / 2, _height * 3.6 / 5)));
+    CCMenuItemImage * normalItem =
+    CCMenuItemImage::create("normal.png", "normal.png",this,
+                            menu_selector(StartGame::onNormal));
+    normalItem->setPosition(_startLayer->
+                            convertToNodeSpace(ccp(_width / 2, _height * 3.6 / 5)));
     
-    CCMenuItemImage * hardItem = CCMenuItemImage::create("hard.png", "hard.png",
-                                                            this, menu_selector(StartGame::onHard));
-    hardItem->setPosition(_startLayer->convertToNodeSpace(ccp(_width / 2, _height * 2.8 / 5)));
+    CCMenuItemImage * hardItem =
+    CCMenuItemImage::create("hard.png", "hard.png", this,
+                            menu_selector(StartGame::onHard));
+    hardItem->setPosition(_startLayer->
+                          convertToNodeSpace(ccp(_width / 2, _height * 2.8 / 5)));
     
-    CCMenuItemImage * sensitiveItem = CCMenuItemImage::create("sensitive.png", "sensitive.png",
-                                                         this, menu_selector(StartGame::onSensitive));
-    sensitiveItem->setPosition(_startLayer->convertToNodeSpace(ccp(_width / 2, _height * 2.0 / 5)));
+    CCMenuItemImage * sensitiveItem =
+    CCMenuItemImage::create("sensitive.png", "sensitive.png", this,
+                            menu_selector(StartGame::onSensitive));
+    sensitiveItem->setPosition(_startLayer->
+                               convertToNodeSpace(ccp(_width / 2, _height * 2.0 / 5)));
     
-    CCMenuItemImage * stealthItem = CCMenuItemImage::create("stealth.png", "stealth.png",
-                                                            this, menu_selector(StartGame::onStealth));
-    stealthItem->setPosition(_startLayer->convertToNodeSpace(ccp(_width / 2, _height * 1.2 / 5)));
+    CCMenuItemImage * stealthItem =
+    CCMenuItemImage::create("stealth.png", "stealth.png", this,
+                            menu_selector(StartGame::onStealth));
+    stealthItem->setPosition(_startLayer->
+                             convertToNodeSpace(ccp(_width / 2, _height * 1.2 / 5)));
     
-    CCMenuItemImage * backItem = CCMenuItemImage::create("quit_small.png", "quit_small.png",
-                                                         this, menu_selector(StartGame::onBack));
-    backItem->setPosition(_startLayer->convertToNodeSpace(ccp(_width / 2, _height * 0.55 / 5)));
+    CCMenuItemImage * backItem =
+    CCMenuItemImage::create("quit_small.png", "quit_small.png", this,
+                            menu_selector(StartGame::onBack));
+    backItem->setPosition(_startLayer->
+                          convertToNodeSpace(ccp(_width / 2, _height * 0.55 / 5)));
     
-    CCMenu *startMenu = CCMenu::create(normalItem, hardItem, sensitiveItem, stealthItem, backItem, NULL);
+    CCMenu *startMenu = CCMenu::create(normalItem, hardItem, sensitiveItem,
+                                       stealthItem, backItem, NULL);
     startMenu->setPosition(ccp(0, 0));
     _startLayer->addChild(startMenu);
     this->addChild(_startLayer);
     _startLayer->setVisible(false);
-
-    
-
     return true;
 }
 
 void StartGame::onStart(CCObject* pSender) {
     _startLayer->setVisible(true);
+}
+
+void StartGame::onRank(CCObject *pSender) {
+    CCDirector::sharedDirector()->replaceScene(RankingScene::scene());
+}
+
+void StartGame::onQuit(CCObject *pSender) {
+    CCDirector::sharedDirector()->end();
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    exit(0);
+#endif
 }
 
 void StartGame::onNormal(CCObject* pSender) {
